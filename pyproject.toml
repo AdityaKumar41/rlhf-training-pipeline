@@ -1,0 +1,44 @@
+[project]
+name = "rlhf-training-pipeline"
+version = "0.1.0"
+description = "End-to-end RLHF training pipeline scaffold with curation, annotation, training orchestration, evaluation, and artifact tracking."
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn[standard]>=0.30.0",
+  "pydantic>=2.7.0",
+  "python-multipart>=0.0.9",
+  "pyyaml>=6.0.1",
+  "numpy>=1.26.0",
+  "torch>=2.3.0",
+  "transformers>=4.42.0",
+  "datasets>=2.20.0",
+  "peft>=0.11.0",
+  "trl>=0.9.6",
+  "deepspeed>=0.14.0",
+  "wandb>=0.17.0",
+  "boto3>=1.34.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.0",
+  "ruff>=0.5.0",
+  "mypy>=1.10.0",
+]
+
+[project.scripts]
+rlhf-pipeline = "rlhf_pipeline.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+

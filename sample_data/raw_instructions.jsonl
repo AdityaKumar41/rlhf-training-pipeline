@@ -1,0 +1,4 @@
+{"source":"sample","prompt":"Explain KL regularization in PPO.","response":"KL regularization keeps the updated policy close to a frozen reference policy so reward optimization does not drift into reward hacking."}
+{"source":"sample","instruction":"What is a reward model?","output":"A reward model is a neural network trained on preference pairs to assign scalar quality scores to model responses."}
+{"source":"sample","prompt":"Explain KL regularization in PPO.","response":"KL regularization keeps the updated policy close to a frozen reference policy so reward optimization does not drift into reward hacking."}
+

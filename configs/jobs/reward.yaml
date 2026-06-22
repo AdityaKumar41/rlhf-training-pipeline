@@ -1,0 +1,15 @@
+name: reward-llama3-8b
+stage: reward
+backend: slurm
+gpu_type: A100-80GB
+gpu_count: 4
+cpu_count: 32
+memory_gb: 512
+image: rlhf-training:latest
+command:
+  - accelerate
+  - launch
+  - scripts/train_reward.py
+  - --config
+  - configs/training/reward.yaml
+
