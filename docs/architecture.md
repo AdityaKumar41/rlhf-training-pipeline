@@ -1,5 +1,72 @@
 # Architecture
 
+## System Design Diagram
+
+```mermaid
+flowchart TD
+  operator["Operator / ML engineer"]
+
+  subgraph data["Data curation"]
+    raw["Raw instruction JSONL"]
+    sample["Sample local data"]
+    cli["Python CLI"]
+    curation["Normalize, dedupe, safety filter, diversity sample"]
+    curated["Curated ShareGPT JSONL"]
+  end
+
+  subgraph training["Training pipeline"]
+    configs["Job configs"]
+    orchestrator["Local / Slurm / Kubernetes orchestrator"]
+    gpu["GPU runtime: TRL, DeepSpeed, LoRA"]
+    sft["SFT adapter"]
+    reward["Reward model"]
+    ppo["PPO optimized policy"]
+  end
+
+  subgraph annotation["Human preference annotation"]
+    candidates["Candidate response pairs"]
+    ui["Next.js annotation UI"]
+    api["FastAPI annotation API"]
+    store[(Annotation store)]
+    prefs["Preference pairs"]
+  end
+
+  subgraph release["Evaluation and release"]
+    evals["Evaluation metrics"]
+    registry[(Artifact registry)]
+    card["Model card"]
+  end
+
+  operator --> cli
+  operator --> ui
+  raw --> cli
+  sample --> cli
+  cli --> curation
+  curation --> curated
+  curated --> configs
+  configs --> orchestrator
+  orchestrator --> gpu
+  gpu --> sft
+  sft --> candidates
+  candidates --> api
+  ui <--> api
+  api <--> store
+  store --> prefs
+  prefs --> reward
+  sft --> ppo
+  reward --> ppo
+  curated --> evals
+  reward --> evals
+  ppo --> evals
+  sft --> registry
+  reward --> registry
+  ppo --> registry
+  evals --> registry
+  registry --> card
+```
+
+The core boundary is between product logic and provider-specific execution. Local mode uses deterministic Python modules, SQLite, and dry-run training contracts. GPU mode binds the same data contracts and configs to TRL, DeepSpeed, W&B, S3, and a production database.
+
 ## Product Flow
 
 1. Raw instruction data enters the curation pipeline.
@@ -25,4 +92,3 @@ The annotation store persists:
 - `annotation_events`: annotator, choice (`a`, `b`, `tie`, `skip`), time taken, timestamp.
 
 The queue avoids serving a task to the same annotator twice. The PRD's 10 percent overlap policy can be implemented by seeding duplicate task assignments through task metadata or a richer scheduler.
-
